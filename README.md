@@ -10,9 +10,15 @@ Run project locally by executing  `docker-compose up` in your command line.
 From within your docker container run:
 ```
 php bin/console doctrine:database:create
-php bin/console doctrine:schema:update --force
+php bin/console doctrine:schema:update --dump-sql --force
 php bin/console doctrine:fixtures:load --no-interaction
 ```
+
+Create api user
+```
+php bin/console app:create-user admin@example.com password123 ROLE_ADMIN,ROLE_USER
+```
+And use generated api-key in requests to app.
 
 Then access webapp at http://localhost:8089/.
 
@@ -36,6 +42,7 @@ composer phpstan
 Request:
 ```
 curl --location --request POST 'http://localhost:8089/api/payment-schedule/calculate' \
+--header 'X-API-KEY: api-key-here' \
 --header 'Content-Type: application/json' \
 --data '{
     "productType": "premium_sub",
