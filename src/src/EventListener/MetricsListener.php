@@ -3,9 +3,9 @@
 namespace App\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MetricsListener implements EventSubscriberInterface
 {
@@ -42,7 +42,7 @@ class MetricsListener implements EventSubscriberInterface
             'duration' => $duration,
             'status' => $event->getResponse()->getStatusCode(),
             'method' => $request->getMethod(),
-            'path' => $request->getPathInfo()
+            'path' => $request->getPathInfo(),
         ];
 
         if ($route = $request->attributes->get('_route')) {
@@ -55,7 +55,7 @@ class MetricsListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'kernel.request'  => ['onKernelRequest', 100],
+            'kernel.request' => ['onKernelRequest', 100],
             'kernel.response' => ['onKernelResponse', -100],
         ];
     }

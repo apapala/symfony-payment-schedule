@@ -32,11 +32,22 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
 
-#    logger.metrics:
-#        alias: monolog.logger.metrics
-#
-#    App\EventListener\MetricsListener:
-#        arguments:
-#            $metricsLogger: '@logger.metrics'
-#        tags:
-#            - { name: kernel.event_listener }
+    _instanceof:
+        App\PaymentRule\PaymentRuleInterface:
+            tags: ['app.payment_rule']
+
+    App\PaymentRule\PaymentRuleFactory:
+        arguments:
+            $rules: !tagged_iterator app.payment_rule
+
+    App\PaymentRule\JuneRule:
+        tags: ['app.payment_rule']
+    
+    App\PaymentRule\MonthToMonthRule:
+        tags: ['app.payment_rule']
+    
+    App\PaymentRule\DelayMonthRule:
+        tags: ['app.payment_rule']
+    
+    App\PaymentRule\OnePaymentRule:
+        tags: ['app.payment_rule']

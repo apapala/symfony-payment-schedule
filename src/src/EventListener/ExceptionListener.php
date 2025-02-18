@@ -24,6 +24,6 @@ class ExceptionListener
             ExceptionContextGenerator::createFromThrowable($exception)
         );
 
-        $event->setResponse($this->responseService->error('Something went seriously wrong.'));
+        $event->setResponse($this->responseService->error('Something went wrong.'));
     }
 }
