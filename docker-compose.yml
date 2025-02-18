@@ -19,9 +19,13 @@ services:
       context: .
       dockerfile: ./docker/php/Dockerfile
     container_name: symfony_php
+    env_file:
+      - ./docker/php/.env
     volumes:
       - ./src:/var/www
     depends_on:
+      - mysql
+    links:
       - mysql
     networks:
       - symfony_net
@@ -31,11 +35,10 @@ services:
     container_name: symfony_mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: symfony
-      MYSQL_USER: symfony
-      MYSQL_PASSWORD: symfony
     ports:
-      - "3306:3306"
+      - "3307:3306"
+    volumes:
+      - './docker/volumes/mysql:/var/lib/mysql'
     networks:
       - symfony_net
 

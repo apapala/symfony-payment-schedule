@@ -3,6 +3,14 @@ Test assignment project done for one of companies that I have applied to.
 
 ## Running locally
 
-In order to run project locally simply execute  `docker-compose up` in your command line.
+Create `.env` file based on `.env.dist` within `./docker/php` directory.
+
+Run project locally by executing  `docker-compose up` in your command line.
 
 Then access webapp at http://localhost:8089/.
+
+Run useful commands from within your docker container:
+```
+composer php-cs-fixer
+composer phpstan
+```
