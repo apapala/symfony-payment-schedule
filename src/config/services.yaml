@@ -31,3 +31,12 @@ services:
     App\EventListener\ExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
+
+#    logger.metrics:
+#        alias: monolog.logger.metrics
+#
+#    App\EventListener\MetricsListener:
+#        arguments:
+#            $metricsLogger: '@logger.metrics'
+#        tags:
+#            - { name: kernel.event_listener }
