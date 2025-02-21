@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ResponseService
 {
@@ -24,7 +25,7 @@ class ResponseService
         return new JsonResponse($response, $statusCode);
     }
 
-    public function error(?string $message = null, array $errors = [], int $statusCode = Response::HTTP_BAD_REQUEST): JsonResponse
+    public function error(?string $message = null, array $errors = [], int $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR): JsonResponse
     {
         $response = [
             'status' => 'error',
@@ -39,5 +40,19 @@ class ResponseService
         }
 
         return new JsonResponse($response, $statusCode);
+    }
+
+    public function requestValidationError(ConstraintViolationListInterface $violations): JsonResponse
+    {
+        $errors = [];
+        foreach ($violations as $violation) {
+            $errors[$violation->getPropertyPath()] = $violation->getMessage();
+        }
+
+        return new JsonResponse([
+            'status' => 'error',
+            'message' => 'Request validation failed',
+            'errors' => $errors,
+        ], Response::HTTP_BAD_REQUEST);
     }
 }

@@ -7,9 +7,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CalculatePaymentScheduleRequest
 {
     #[Assert\NotBlank]
+    #[Assert\NotNull]
     private string $productType;
 
     #[Assert\NotBlank]
+    #[Assert\NotNull]
     private string $productName;
 
     #[Assert\Collection(
@@ -63,8 +65,11 @@ class CalculatePaymentScheduleRequest
     public function setProductSoldDate(\DateTimeImmutable|string $productSoldDate): self
     {
         if (is_string($productSoldDate)) {
-            $date = new \DateTimeImmutable($productSoldDate);
-            $this->productSoldDate = $date;
+            try {
+                $this->productSoldDate = new \DateTimeImmutable($productSoldDate);
+            } catch (\Throwable $e) {
+                $this->productSoldDate = new \DateTimeImmutable('now');
+            }
         } else {
             $this->productSoldDate = $productSoldDate;
         }

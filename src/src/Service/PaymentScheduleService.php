@@ -36,7 +36,6 @@ class PaymentScheduleService
 
         if ('UTC' !== $productSoldDate->getTimezone()->getName()) {
             $productSoldDate = (clone $productSoldDate)->setTimezone(new \DateTimeZone('UTC'));
-            $name = $productSoldDate->getTimezone()->getName();
         }
 
         $instruction = new PaymentInstruction();
