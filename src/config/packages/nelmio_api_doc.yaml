@@ -1,0 +1,20 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: Payment Schedule API
+            description: API for calculating payment schedules for an payment instruction
+            version: 1.0.0
+        components:
+            securitySchemes:
+                ApiKeyAuth:
+                    type: apiKey
+                    in: header
+                    name: X-API-KEY
+        security:
+            - ApiKeyAuth: []
+    areas:
+        default:
+            path_patterns:
+                - ^/api(?!/doc$)
+    use_validation_groups: true
+    media_types: ['application/json'] 

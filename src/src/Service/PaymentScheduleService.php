@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\PaymentInstruction;
+use App\Message\ProcessPaymentSchedulesMessage;
+use App\PaymentRule\PaymentRuleFactory;
 use App\Repository\CurrencyRepository;
 use App\Repository\PaymentInstructionRepository;
 use App\Repository\ProductTypeRepository;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class PaymentScheduleService
 {
     public function __construct(
-        private readonly PaymentScheduleCalculator $calculator,
         private readonly ProductPaymentRuleResolver $productPaymentRuleResolver,
         private readonly CurrencyRepository $currencyRepository,
         private readonly ProductTypeRepository $productTypeRepository,
         private readonly PaymentInstructionRepository $paymentInstructionRepository,
+        private readonly MessageBusInterface $messageBus,
+        private readonly PaymentRuleFactory $ruleFactory,
     ) {
     }
 
@@ -27,7 +31,7 @@ class PaymentScheduleService
         int $amount,
         string $currency,
         \DateTimeImmutable $productSoldDate,
-    ): array {
+    ): void {
         $productType = $this->productTypeRepository->findOneBy(['code' => $productType])
             ?? throw new \InvalidArgumentException('Product type not found');
 
@@ -53,12 +57,19 @@ class PaymentScheduleService
         );
         $instruction->setRuleType($ruleType);
 
-        $schedules = $this->calculator->calculate($instruction);
-
-        // We can save payment instruction here or pass it through Messenger component for processing later.
-        // Data with what schedules will be created will be returned to a calling method.
         $this->paymentInstructionRepository->store($instruction);
 
-        return $schedules;
+        $this->messageBus->dispatch(new ProcessPaymentSchedulesMessage($instruction->getId()));
+    }
+
+    public function handleMessage(ProcessPaymentSchedulesMessage $message): void
+    {
+        $instruction = $this->paymentInstructionRepository->find($message->getPaymentInstructionId())
+            ?? throw new \InvalidArgumentException('Payment instruction not found');
+
+        $rule = $this->ruleFactory->getRule($instruction->getRuleType());
+        $rule->calculatePaymentSchedules($instruction);
+
+        $this->paymentInstructionRepository->store($instruction);
     }
 }

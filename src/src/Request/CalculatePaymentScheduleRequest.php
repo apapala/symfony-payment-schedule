@@ -14,6 +14,8 @@ class CalculatePaymentScheduleRequest
     #[Assert\NotNull]
     private string $productName;
 
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
     #[Assert\Collection(
         fields: [
             'amount' => [

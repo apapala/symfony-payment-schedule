@@ -127,4 +127,11 @@ class PaymentInstruction
 
         return $this;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->getId(),
+        ];
+    }
 }

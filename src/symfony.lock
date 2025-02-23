@@ -50,6 +50,15 @@
             ".php-cs-fixer.dist.php"
         ]
     },
+    "nelmio/api-doc-bundle": {
+        "version": "4.37",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "3.0",
+            "ref": "c8e0c38e1a280ab9e37587a8fa32b251d5bc1c94"
+        }
+    },
     "phpstan/phpstan": {
         "version": "2.1",
         "recipe": {
@@ -118,6 +127,18 @@
             "public/index.php",
             "src/Controller/.gitignore",
             "src/Kernel.php"
+        ]
+    },
+    "symfony/messenger": {
+        "version": "6.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.0",
+            "ref": "ba1ac4e919baba5644d31b57a3284d6ba12d52ee"
+        },
+        "files": [
+            "config/packages/messenger.yaml"
         ]
     },
     "symfony/monolog-bundle": {

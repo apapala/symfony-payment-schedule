@@ -8,6 +8,9 @@ use App\Entity\PaymentInstruction;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @method PaymentInstruction|null find($id, $lockMode = null, $lockVersion = null)
+ */
 class PaymentInstructionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

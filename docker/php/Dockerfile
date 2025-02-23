@@ -20,6 +20,9 @@ RUN pecl install xdebug \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Copy custom PHP configuration
+COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
+
 WORKDIR /var/www
 
 COPY ./docker/php/Entrypoint.sh /
