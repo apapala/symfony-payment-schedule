@@ -25,11 +25,11 @@ class PaymentScheduleController extends AbstractController
     }
 
     #[OA\Post(
-        path: '/api/payment-schedule/calculate',
-        description: 'Calculates a payment schedule based on product details',
-        summary: 'Calculate payment schedule',
+        path: '/api/payment-instructions',
+        description: 'Creates a new payment instruction with calculated schedule',
+        summary: 'Create payment instruction',
         security: [['ApiKeyAuth' => []]],
-        tags: ['Payment Schedule']
+        tags: ['Payment Instructions']
     )]
     #[OA\RequestBody(
         required: true,
@@ -50,11 +50,14 @@ class PaymentScheduleController extends AbstractController
         )
     )]
     #[OA\Response(
-        response: 200,
-        description: 'Payment schedules scheduled',
+        response: 201,
+        description: 'Payment instruction created',
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(property: 'status', type: 'string', example: 'success'),
+                new OA\Property(property: 'data', properties: [
+                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                ], type: 'object'),
             ]
         )
     )]
@@ -79,8 +82,8 @@ class PaymentScheduleController extends AbstractController
             ]
         )
     )]
-    #[Route('/api/payment-schedule/calculate', methods: ['POST'])]
-    public function calculateSchedule(Request $request): JsonResponse
+    #[Route('/api/payment-instructions', methods: ['POST'])]
+    public function createPaymentInstruction(Request $request): JsonResponse
     {
         try {
             /** @var CalculatePaymentScheduleRequest $calculateRequest */
@@ -89,17 +92,113 @@ class PaymentScheduleController extends AbstractController
                 CalculatePaymentScheduleRequest::class
             );
 
-            $this->paymentScheduleService->calculateSchedule(
+            $instructionId = $this->paymentScheduleService->calculateSchedule(
                 $calculateRequest->getProductType(),
                 $calculateRequest->getProductPriceAmount(),
                 $calculateRequest->getProductPriceCurrency(),
                 $calculateRequest->getProductSoldDate()
             );
 
-            return $this->responseService->success();
+            return $this->responseService->resourceCreated(data: ['id' => $instructionId]);
         } catch (\Throwable $e) {
-            $this->logger->error('Error generating payment schedule.', ExceptionContextGenerator::createFromThrowable($e));
-            throw $e; // Let ExceptionListener handle the response for now
+            $this->logger->error('Error creating payment instruction.', ExceptionContextGenerator::createFromThrowable($e));
+            throw $e;
+        }
+    }
+
+    #[OA\Get(
+        path: '/api/payment-instructions/{id}',
+        description: 'Retrieves payment instruction details including payment schedules',
+        summary: 'Get payment instruction details',
+        security: [['ApiKeyAuth' => []]],
+        tags: ['Payment Instructions']
+    )]
+    #[OA\Parameter(
+        name: 'id',
+        description: 'Payment instruction ID',
+        in: 'path',
+        required: true,
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Payment instruction details',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'status', type: 'string', example: 'success'),
+                new OA\Property(
+                    property: 'data',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(
+                            property: 'productType',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'name', type: 'string', example: 'Premium Sub'),
+                                    new OA\Property(property: 'code', type: 'string', example: 'premium_sub'),
+                                    new OA\Property(property: 'default_payment_rule', type: 'string', example: 'month_to_month_rule'),
+                                ]
+                            )
+                        ),
+                        new OA\Property(property: 'productSoldDate', type: 'string', format: 'date-time'),
+                        new OA\Property(
+                            property: 'paymentSchedules',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'id', type: 'integer', example: 1),
+                                    new OA\Property(
+                                        property: 'money',
+                                        type: 'array',
+                                        items: new OA\Items(
+                                            properties: [
+                                                new OA\Property(property: 'amount', type: 'number', example: 100000),
+                                                new OA\Property(property: 'currency', type: 'string', example: 'PLN'),
+                                            ]
+                                        )
+                                    ),
+                                    new OA\Property(property: 'dueDate', type: 'string', format: 'date-time'),
+                                ]
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'money',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'amount', type: 'number', example: 100000),
+                                    new OA\Property(property: 'currency', type: 'string', example: 'PLN'),
+                                ]
+                            )
+                        ),
+                    ],
+                    type: 'object'
+                ),
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Payment instruction not found',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: 'status', type: 'string', example: 'error'),
+                new OA\Property(property: 'message', type: 'string', example: 'Payment instruction not found'),
+            ]
+        )
+    )]
+    #[Route('/api/payment-instructions/{id}', methods: ['GET'])]
+    public function getPaymentInstruction(int $id): JsonResponse
+    {
+        try {
+            $paymentInstruction = $this->paymentScheduleService->getPaymentInstruction($id);
+
+            return $this->json($paymentInstruction);
+        } catch (\Throwable $e) {
+            $this->logger->error('Error retrieving payment instruction.', ExceptionContextGenerator::createFromThrowable($e));
+            throw $e;
         }
     }
 }

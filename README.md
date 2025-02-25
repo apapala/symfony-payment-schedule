@@ -45,8 +45,7 @@ docker exec symfony_php bin/console messenger:transport:setup-transport
 ```
 Then run consumer
 ```
-docker exec -it symfony_php bash && \
- php bin/console messenger:consume async -vv
+docker exec symfony_php php bin/console messenger:consume async -vv
 ```
 
 ## Usage and API doc

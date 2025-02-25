@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Dto\PaymentScheduleDto;
 use Doctrine\ORM\Mapping as ORM;
-use Money\Currencies\ISOCurrencies;
-use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity]
 class PaymentSchedule
@@ -14,24 +14,32 @@ class PaymentSchedule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['default'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: PaymentInstruction::class, inversedBy: 'paymentSchedules')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Ignore]
     private ?PaymentInstruction $paymentInstruction = null;
 
     #[ORM\Column]
+    #[Ignore]
     private string $amount;
 
+    #[Groups(['default'])]
+    #[SerializedName('money')]
     private ?Money $money = null;
 
     #[ORM\Column]
+    #[Groups(['default'])]
     private ?\DateTimeImmutable $dueDate = null;
 
     #[ORM\Column]
+    #[Ignore]
     private bool $isPaid = false;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    #[Ignore]
     private ?\DateTimeImmutable $paidAt = null;
 
     public function getId(): ?int
@@ -117,17 +125,5 @@ class PaymentSchedule
         $this->amount = $money->getAmount();
 
         return $this;
-    }
-
-    public function toDto(): PaymentScheduleDto
-    {
-        $currencies = new ISOCurrencies();
-        $moneyFormatter = new DecimalMoneyFormatter($currencies);
-
-        return new PaymentScheduleDto(
-            (float) $moneyFormatter->format($this->getMoney()),
-            $this->paymentInstruction->getMoney()->getCurrency()->getCode(),
-            $this->dueDate
-        );
     }
 }

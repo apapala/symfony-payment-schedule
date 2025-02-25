@@ -8,6 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: PaymentInstructionRepository::class)]
 class PaymentInstruction
@@ -15,27 +18,35 @@ class PaymentInstruction
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['default'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: ProductType::class)]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['default'])]
     private ?ProductType $productType = null;
 
     #[ORM\Column]
     private string $amount;
 
     #[ORM\Column(length: 3)]
+    #[Ignore]
     private string $currencyCode;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['default'])]
     private string $ruleType;
 
     #[ORM\OneToMany(targetEntity: PaymentSchedule::class, mappedBy: 'paymentInstruction', cascade: ['persist'])]
+    #[Groups(['default'])]
     private Collection $paymentSchedules;
 
     #[ORM\Column]
+    #[Groups(['default'])]
     private ?\DateTimeImmutable $productSoldDate = null;
 
+    #[Groups(['default'])]
+    #[SerializedName('money')]
     private ?Money $money = null;
 
     public function __construct()

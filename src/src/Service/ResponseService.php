@@ -42,6 +42,19 @@ class ResponseService
         return new JsonResponse($response, $statusCode);
     }
 
+    public function resourceCreated(?string $message = null, array $data = [], int $statusCode = Response::HTTP_CREATED): JsonResponse
+    {
+        return $this->success($message, $data, $statusCode);
+    }
+
+    public function resourceNotFound(string $message, $statusCode = Response::HTTP_NOT_FOUND): JsonResponse
+    {
+        return new JsonResponse([
+            'status' => 'error',
+            'message' => $message,
+        ], $statusCode);
+    }
+
     public function requestValidationError(ConstraintViolationListInterface $violations): JsonResponse
     {
         $errors = [];

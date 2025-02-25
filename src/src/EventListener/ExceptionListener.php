@@ -8,6 +8,7 @@ use App\Service\ResponseService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ExceptionListener
 {
@@ -22,6 +23,12 @@ class ExceptionListener
         $exception = $event->getThrowable();
 
         if ($exception instanceof HttpException) {
+            if ($exception instanceof NotFoundHttpException) {
+                $event->setResponse(
+                    $this->responseService->resourceNotFound($exception->getMessage())
+                );
+            }
+
             return;
         }
 

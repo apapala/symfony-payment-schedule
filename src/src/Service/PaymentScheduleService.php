@@ -12,6 +12,7 @@ use App\Repository\PaymentInstructionRepository;
 use App\Repository\ProductTypeRepository;
 use Money\Currency;
 use Money\Money;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class PaymentScheduleService
@@ -31,12 +32,12 @@ class PaymentScheduleService
         int $amount,
         string $currency,
         \DateTimeImmutable $productSoldDate,
-    ): void {
+    ): int {
         $productType = $this->productTypeRepository->findOneBy(['code' => $productType])
-            ?? throw new \InvalidArgumentException('Product type not found');
+            ?? throw new NotFoundHttpException('Product type not found');
 
         $this->currencyRepository->findOneBy(['code' => $currency])
-            ?? throw new \InvalidArgumentException('Currency not found');
+            ?? throw new NotFoundHttpException('Currency not found');
 
         if ('UTC' !== $productSoldDate->getTimezone()->getName()) {
             $productSoldDate = (clone $productSoldDate)->setTimezone(new \DateTimeZone('UTC'));
@@ -60,12 +61,20 @@ class PaymentScheduleService
         $this->paymentInstructionRepository->store($instruction);
 
         $this->messageBus->dispatch(new ProcessPaymentSchedulesMessage($instruction->getId()));
+
+        return $instruction->getId();
+    }
+
+    public function getPaymentInstruction(int $id): PaymentInstruction
+    {
+        return $this->paymentInstructionRepository->find($id)
+            ?? throw new NotFoundHttpException('Payment instruction not found');
     }
 
     public function handleMessage(ProcessPaymentSchedulesMessage $message): void
     {
         $instruction = $this->paymentInstructionRepository->find($message->getPaymentInstructionId())
-            ?? throw new \InvalidArgumentException('Payment instruction not found');
+            ?? throw new NotFoundHttpException('Payment instruction not found');
 
         $rule = $this->ruleFactory->getRule($instruction->getRuleType());
         $rule->calculatePaymentSchedules($instruction);
