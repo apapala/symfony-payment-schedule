@@ -35,6 +35,7 @@ services:
       dockerfile: ./docker/php/Dockerfile
       target: php-messenger
     container_name: symfony_php_messenger
+    restart: unless-stopped
     env_file:
       - ./docker/php/.env
     volumes:
