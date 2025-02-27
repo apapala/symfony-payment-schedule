@@ -18,6 +18,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
+      target: php
     container_name: symfony_php
     env_file:
       - ./docker/php/.env
@@ -25,7 +26,20 @@ services:
       - ./src:/var/www
     depends_on:
       - mysql
-    links:
+    networks:
+      - symfony_net
+
+  php-messenger:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      target: php-messenger
+    container_name: symfony_php_messenger
+    env_file:
+      - ./docker/php/.env
+    volumes:
+      - ./src:/var/www
+    depends_on:
       - mysql
     networks:
       - symfony_net

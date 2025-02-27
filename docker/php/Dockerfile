@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.3-fpm as base
 
 RUN apt-get update && apt-get install -y \
     unzip \
@@ -20,11 +20,14 @@ RUN pecl install xdebug \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy custom PHP configuration
 COPY ./docker/php/php.ini /usr/local/etc/php/conf.d/php.ini
 
 WORKDIR /var/www
 
+FROM base as php
 COPY ./docker/php/Entrypoint.sh /
+ENTRYPOINT ["/bin/sh", "/Entrypoint.sh"]
 
-ENTRYPOINT /bin/sh /Entrypoint.sh
+FROM base as php-messenger
+COPY ./docker/php/EntrypointMessenger.sh /
+ENTRYPOINT ["/bin/sh", "/EntrypointMessenger.sh"]
