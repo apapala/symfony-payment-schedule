@@ -39,10 +39,6 @@ class PaymentScheduleService
         $this->currencyRepository->findOneBy(['code' => $currency])
             ?? throw new NotFoundHttpException('Currency not found');
 
-        if ('UTC' !== $productSoldDate->getTimezone()->getName()) {
-            $productSoldDate = (clone $productSoldDate)->setTimezone(new \DateTimeZone('UTC'));
-        }
-
         $instruction = new PaymentInstruction();
         $instruction->setProductType($productType);
         $instruction->setCurrencyCode($currency);

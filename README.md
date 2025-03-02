@@ -5,7 +5,7 @@ Test assignment project done for one of companies that I have applied to.
 
 Create `.env` file based on `.env.dist` within `./docker/php` directory.
 
-Run project locally by executing  `docker-compose up` in your command line. 
+Run project locally by executing  `docker-compose up` in your command line.
 
 From within your docker container run:
 ```
@@ -39,11 +39,12 @@ composer phpstan
 ```
 
 ### Symfony Messenger
-Messenger is used within thi project. In order to set up doctrine transport run
+Messenger is used within this project. In order to set up doctrine transport run
 ```
 docker exec symfony_php bin/console messenger:transport:setup-transport
 ```
-Then run consumer
+Then run consumer. Please note that currently below is available as a standalone docker container that runs in a background, 
+so once you run `docker-compose up` you will have verything set up.
 ```
 docker exec symfony_php php bin/console messenger:consume async -vv
 ```

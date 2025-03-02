@@ -117,7 +117,7 @@ class PaymentInstruction
 
     public function setProductSoldDate(\DateTimeImmutable $date): self
     {
-        $this->productSoldDate = $date->setTimezone(new \DateTimeZone('UTC'));
+        $this->productSoldDate = $date;
 
         return $this;
     }

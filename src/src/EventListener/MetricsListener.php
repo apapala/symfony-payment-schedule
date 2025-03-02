@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class MetricsListener implements EventSubscriberInterface
 {
@@ -55,8 +56,8 @@ class MetricsListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            'kernel.request' => ['onKernelRequest', 100],
-            'kernel.response' => ['onKernelResponse', -100],
+            KernelEvents::REQUEST => ['onKernelRequest', 100],
+            KernelEvents::RESPONSE => ['onKernelResponse', -100],
         ];
     }
 }
