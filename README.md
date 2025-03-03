@@ -26,11 +26,11 @@ If you would like to drop schema and recreate it with fixtures:
 ```
 php bin/console doctrine:database:drop --force && \
 php bin/console doctrine:database:create &&  \
-php bin/console doctrine:sch1ema:update --dump-sql --force && \
+php bin/console doctrine:schema:update --dump-sql --force && \
 php bin/console doctrine:fixtures:load --no-interaction && \
 php bin/console app:create-user admin@example.com password123 ROLE_ADMIN,ROLE_USER
 ```
-Remember about creating an API user in order to execute any requests and running messenger consumer
+Remember about creating an API user in order to execute any requests.
 
 ### Run useful commands from within your docker container:
 ```
@@ -44,7 +44,7 @@ Messenger is used within this project. In order to set up doctrine transport run
 docker exec symfony_php bin/console messenger:transport:setup-transport
 ```
 Then run consumer. Please note that currently below is available as a standalone docker container that runs in a background, 
-so once you run `docker-compose up` you will have verything set up.
+so once you run `docker-compose up` you will have everything set up.
 ```
 docker exec symfony_php php bin/console messenger:consume async -vv
 ```
