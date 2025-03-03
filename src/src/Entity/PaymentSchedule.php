@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Money\Money;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
@@ -11,6 +12,8 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 #[ORM\Entity]
 class PaymentSchedule
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -41,6 +44,12 @@ class PaymentSchedule
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     #[Ignore]
     private ?\DateTimeImmutable $paidAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
     public function getId(): ?int
     {
